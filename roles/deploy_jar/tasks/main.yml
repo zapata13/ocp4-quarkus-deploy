@@ -1,10 +1,4 @@
 ---
-- name: Install multi python packages with version specifiers
-  pip:
-    name: 
-      - openshift
-      - requests
-      - requests-oauthlib
 - name: Log in (obtain access token)
   k8s_auth:
     username: "{{oc_username}}"
