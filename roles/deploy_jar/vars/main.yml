@@ -9,4 +9,4 @@ oc_username: "opentlc-mgr"
 oc_password: "r3dh4t1!"
 oc_host: "https://api.cluster-8050.8050.sandbox438.opentlc.com:6443"
 oc_project: "davivienda-qa"
-oc_file_jar: /home/erivasza/Documents/REDHAT/DEMOS/DAVIVIENDA/OCP/test-quarkus/target/hello-2.7-runner.jar
+oc_file_jar: /home/erivasza/Documents/DEMOS/BG-ANSIBLE/test-quarkus/target/hello-2.5-runner.jar

@@ -6,6 +6,17 @@
     host: "{{oc_host}}"
     validate_certs: false
   register: oc_auth
+- name: Login OC
+  command: 
+    cmd: "oc login --server={{oc_host}} --username={{oc_username}} --password={{oc_password}} --insecure-skip-tls-verify"
+- name: Download artifact
+  maven_artifact:
+    group_id: "{{ app_group_id }}"
+    artifact_id: "{{ app_artifact_id }}"
+    repository_url: "{{ maven_repository_url }}"
+    extension: "{{ artifact_extension_type }}"
+    version: "{{ app_version }}"
+    dest: "{{ app_folder }}/{{ app_artifact_id }}-{{ app_version }}.{{ artifact_extension_type }}"
 - name: Ensure the davivienda-dev Namespace exists.
   kubernetes.core.k8s:
     api_version: v1
@@ -16,24 +27,24 @@
     validate_certs: false
     api_key: "{{oc_auth.k8s_auth.api_key}}"
 - name: Ensure the BuildConfig exists
-  ansible.builtin.command: 
+  command: 
     cmd: "oc get bc quarkus-build -n {{oc_project}}"
   register: ocp_bc
   ignore_errors: yes
 - name: If not exists create BC
-  ansible.builtin.command: 
+  command: 
     cmd: "oc new-build java --name quarkus-build --binary -n {{oc_project}}"
   when: "'No resources found.' in ocp_bc.stderr_lines"
 - name: Upload jar to image
-  ansible.builtin.command: 
+  command: 
     cmd: "oc start-build quarkus-build --from-file={{oc_file_jar}} --follow -n {{oc_project}}"
 - name: Ensure the BuildConfig exists
-  ansible.builtin.command: 
+  command: 
     cmd: "oc get dc quarkus-build -n {{oc_project}}"
   register: ocp_dc
   ignore_errors: yes
 - name: Create POD
-  ansible.builtin.command: 
+  command: 
     cmd: "oc new-app quarkus-build -n {{oc_project}}"
   when: "'No resources found.' in ocp_dc.stderr_lines"
 - name: Expose quarkus rest  port with ClusterIP
@@ -53,24 +64,14 @@
       app: quarkus-build
       deploymentconfig: quarkus-build
 - name: Ensure the Route exists
-  ansible.builtin.command: 
+  command: 
     cmd: "oc get routes quarkus-build -n {{oc_project}}"
   register: ocp_route
   ignore_errors: yes
 - name: Create Route
-  ansible.builtin.command: 
+  command: 
     cmd: "oc expose svc quarkus-build -n {{oc_project}}"
   when: "'No resources found.' in ocp_route.stderr_lines"
-  
-# - name: Download artifact
-#   maven_artifact:
-#     group_id: "{{ app_group_id }}"
-#     artifact_id: "{{ app_artifact_id }}"
-#     repository_url: "{{ maven_repository_url }}"
-#     extension: "{{ artifact_extension_type }}"
-#     version: "{{ app_version }}"
-#     dest: "{{ app_folder }}/{{ app_artifact_id }}-{{ app_version }}.{{ artifact_extension_type }}"
- 
 
 #oc new-build java --name test1 --binary
 #oc start-build test1 --from-file=target/hello-2.7-runner.jar --follow
