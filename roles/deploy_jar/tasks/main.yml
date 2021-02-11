@@ -21,7 +21,7 @@
 - name: If not exists create Namespace
   shell: 
     cmd: "oc new-project {{oc_project}}"
-  when: "'Error from server (NotFound)' in ocp_ns.stderr_lines"
+  when: "'Error from server (NotFound)' in ocp_ns.stderr"
 - name: Ensure the BuildConfig exists
   shell: 
     cmd: "oc get bc quarkus-build -n {{oc_project}}"
