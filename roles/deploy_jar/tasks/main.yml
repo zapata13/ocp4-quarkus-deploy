@@ -33,7 +33,7 @@
   ignore_errors: yes
 - name: If not exists create Namespace
   shell: 
-    cmd: "oc new-build java --name quarkus-build --binary -n {{oc_project}}"
+    cmd: "oc new-project {{oc_project}}"
   when: "'Error from server (NotFound)' in ocp_ns.stderr_lines"
 - name: Ensure the BuildConfig exists
   shell: 
