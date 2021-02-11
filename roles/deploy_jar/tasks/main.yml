@@ -1,6 +1,6 @@
 ---
 - name: Log in (obtain access token)
-  kubernetes.core.k8s_auth:
+  k8s_auth:
     username: "{{oc_username}}"
     password: "{{oc_password}}"
     host: "{{oc_host}}"
@@ -18,7 +18,7 @@
     version: "{{ app_version }}"
     dest: "{{ app_folder }}/{{ app_artifact_id }}-{{ app_version }}.{{ artifact_extension_type }}"
 - name: Ensure the davivienda-dev Namespace exists.
-  kubernetes.core.k8s:
+  k8s:
     api_version: v1
     kind: Namespace
     name: "{{oc_project}}"
@@ -48,7 +48,7 @@
     cmd: "oc new-app quarkus-build -n {{oc_project}}"
   when: "'No resources found.' in ocp_dc.stderr_lines"
 - name: Expose quarkus rest  port with ClusterIP
-  kubernetes.core.k8s_service:
+  k8s_service:
     state: present
     name: quarkus-build
     namespace: "{{oc_project}}"
