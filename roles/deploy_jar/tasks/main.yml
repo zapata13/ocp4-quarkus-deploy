@@ -17,7 +17,7 @@
   ignore_errors: yes
 - name: print ocp_ns
   debug:
-    msg:"{{ocp_ns}}"
+    msg: "{{ocp_ns}}"
 - name: If not exists create Namespace
   shell: 
     cmd: "oc new-project {{oc_project}}"
