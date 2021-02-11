@@ -30,7 +30,7 @@
 - name: If not exists create BC
   shell: 
     cmd: "oc new-build java --name quarkus-build --binary -n {{oc_project}}"
-  when: "'No resources found.' in ocp_bc.stderr_lines"
+  when: "'No resources found.' in ocp_bc.stderr"
 - name: Upload jar to image
   shell: 
     cmd: "oc start-build quarkus-build --from-file={{ app_folder }}/{{ app_artifact_id }}-{{ app_version }}.{{ artifact_extension_type }} --follow -n {{oc_project}}"
@@ -42,7 +42,7 @@
 - name: Create POD
   shell: 
     cmd: "oc new-app quarkus-build -n {{oc_project}}"
-  when: "'No resources found.' in ocp_dc.stderr_lines"
+  when: "'No resources found.' in ocp_dc.stderr"
 - name: Expose quarkus rest  port with ClusterIP
   k8s_service:
     state: present
@@ -67,4 +67,4 @@
 - name: Create Route
   shell: 
     cmd: "oc expose svc quarkus-build -n {{oc_project}}"
-  when: "'No resources found.' in ocp_route.stderr_lines"
+  when: "'No resources found.' in ocp_route.stderr"
