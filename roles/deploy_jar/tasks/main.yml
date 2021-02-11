@@ -1,11 +1,4 @@
 ---
-# - name: Log in (obtain access token)
-#   k8s_auth:
-#     username: "{{oc_username}}"
-#     password: "{{oc_password}}"
-#     host: "{{oc_host}}"
-#     validate_certs: false
-#   register: oc_auth
 - name: Login OC
   shell: 
     cmd: "oc login --server={{oc_host}} --username={{oc_username}} --password={{oc_password}} --insecure-skip-tls-verify"
@@ -17,20 +10,14 @@
     extension: "{{ artifact_extension_type }}"
     version: "{{ app_version }}"
     dest: "{{ app_folder }}/{{ app_artifact_id }}-{{ app_version }}.{{ artifact_extension_type }}"
-# - name: Ensure the davivienda-dev Namespace exists.
-#   k8s:
-#     api_version: v1
-#     kind: Namespace
-#     name: "{{oc_project}}"
-#     state: present
-#     host: "{{oc_host}}"
-#     validate_certs: false
-#     api_key: "{{oc_auth.k8s_auth.api_key}}"
 - name: Ensure the Namespace exists
   shell: 
     cmd: "oc get project {{oc_project}}"
   register: ocp_ns
   ignore_errors: yes
+- name: print ocp_ns
+  debug:
+    msg:"{{ocp_ns}}"
 - name: If not exists create Namespace
   shell: 
     cmd: "oc new-project {{oc_project}}"
@@ -81,9 +68,3 @@
   shell: 
     cmd: "oc expose svc quarkus-build -n {{oc_project}}"
   when: "'No resources found.' in ocp_route.stderr_lines"
-
-#oc new-build java --name test1 --binary
-#oc start-build test1 --from-file=target/hello-2.7-runner.jar --follow
-#oc new-app test1
-#oc expose svc/test1
-#kind: BuildConfig
