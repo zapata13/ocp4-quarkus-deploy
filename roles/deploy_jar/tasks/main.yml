@@ -37,7 +37,7 @@
   when: "'No resources found.' in ocp_bc.stderr_lines"
 - name: Upload jar to image
   command: 
-    cmd: "oc start-build quarkus-build --from-file={{oc_file_jar}} --follow -n {{oc_project}}"
+    cmd: "oc start-build quarkus-build --from-file={{ app_folder }}/{{ app_artifact_id }}-{{ app_version }}.{{ artifact_extension_type }} --follow -n {{oc_project}}"
 - name: Ensure the BuildConfig exists
   command: 
     cmd: "oc get dc quarkus-build -n {{oc_project}}"
