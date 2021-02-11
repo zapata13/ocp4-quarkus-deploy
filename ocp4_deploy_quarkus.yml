@@ -1,0 +1,10 @@
+---
+- name: Deploy Application
+  hosts: localhost
+  gather_facts: false
+
+  collections:
+    - community.kubernetes
+
+  roles:
+    - deploy_jar
