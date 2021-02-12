@@ -36,7 +36,7 @@
     cmd: "oc start-build quarkus-build --from-file={{ app_folder }}/{{ app_artifact_id }}-{{ app_version }}.{{ artifact_extension_type }} --follow -n {{oc_project}}"
 - name: Ensure the BuildConfig exists
   shell: 
-    cmd: "oc get dc quarkus-build -n {{oc_project}}"
+    cmd: "oc get deployment quarkus-build -n {{oc_project}}"
   register: ocp_dc
   ignore_errors: yes
 - name: Create POD
