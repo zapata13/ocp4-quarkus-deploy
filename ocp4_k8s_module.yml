@@ -7,6 +7,8 @@
     redhat.openshift.openshift_auth:
       host: "https://api.cluster-8050.8050.sandbox438.opentlc.com:6443"
       validate_certs: false
+  vars_files:
+    - vars/k8s_vars.yml
 
   tasks:
   - name: Log in (obtain access token)
@@ -14,3 +16,95 @@
       username: opentlc-mgr
       password: r3dh4t1!
     register: openshift_auth_results
+  - name: Download artifact
+    maven_artifact:
+      group_id: "{{ app_group_id }}"
+      artifact_id: "{{ app_artifact_id }}"
+      repository_url: "{{ maven_repository_url }}"
+      extension: "{{ artifact_extension_type }}"
+      version: "{{ app_version }}"
+      dest: "{{ app_folder }}/{{ app_artifact_id }}-{{ app_version }}.{{ artifact_extension_type }}"
+    ignore_errors: yes
+  - name: Create a k8s namespace
+    redhat.openshift.k8s:
+      name: "{{oc_project}}"
+      api_version: v1
+      kind: Namespace
+      state: present
+      api_key: "{{ openshift_auth_results.openshift_auth.api_key }}"
+  - name: Create IS app
+    redhat.openshift.k8s:
+      state: present
+      api_key: "{{ openshift_auth_results.openshift_auth.api_key }}"
+      definition:
+        kind: ImageStream
+        metadata:
+          name: "{{app_artifact_id}}"
+          namespace: "{{oc_project}}"
+  - name: Create a BuildConfig object from an inline definition
+    redhat.openshift.k8s:
+      state: present
+      api_key: "{{ openshift_auth_results.openshift_auth.api_key }}"
+      definition:
+        kind: BuildConfig
+        apiVersion: v1
+        metadata:
+          name: "{{app_artifact_id}}"
+          namespace: "{{oc_project}}"
+          labels:
+            build: "{{app_artifact_id}}"
+        spec:
+          nodeSelector: null
+          output:
+            to:
+              kind: ImageStreamTag
+              name: '{{app_artifact_id}}:latest'
+          strategy:
+            type: Source
+            sourceStrategy:
+              from:
+                kind: ImageStreamTag
+                namespace: openshift
+                name: 'java:11'
+          source:
+            type: Binary
+  - name: Upload jar to image
+    shell: 
+      cmd: "oc start-build {{ app_artifact_id }} --from-file={{ app_folder }}/{{ app_artifact_id }}-{{ app_version }}.{{ artifact_extension_type }} --follow -n {{oc_project}}"
+  - name: Ensure the Deployment exists
+    shell: 
+      cmd: "oc get deployment {{ app_artifact_id }} -n {{oc_project}}"
+    register: ocp_dc
+    ignore_errors: yes
+  - name: Create POD
+    shell: 
+      cmd: "oc new-app {{ app_artifact_id }} -n {{oc_project}}"
+    when: "'Error from server (NotFound)' in ocp_dc.stderr"
+  - name: Create a Service object from an inline definition
+    redhat.openshift.k8s:
+      state: present
+      api_key: "{{ openshift_auth_results.openshift_auth.api_key }}"
+      definition:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: "{{app_artifact_id}}"
+          namespace: "{{oc_project}}"
+          labels:
+            app: "{{app_artifact_id}}"
+            app.kubernetes.io/component: "{{app_artifact_id}}"
+            app.kubernetes.io/instance: "{{app_artifact_id}}"
+        spec:
+          selector:
+            deployment: "{{app_artifact_id}}"
+          ports:
+          - protocol: TCP
+            targetPort: 9080
+            name: 8080-tcp
+            port: 8080
+  - name: Expose App Service
+    redhat.openshift.openshift_route:
+      api_key: "{{ openshift_auth_results.openshift_auth.api_key }}"
+      service: "{{app_artifact_id}}"
+      namespace: "{{oc_project}}"
+      state: present

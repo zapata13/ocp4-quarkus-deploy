@@ -1,0 +1,13 @@
+---
+app_artifact_id: "hello"
+artifact_extension_type: "jar"
+app_folder: "/home/erivasza/Documents/DEMOS/BG-ANSIBLE/test-quarkus/target"
+app_group_id: "com.redhat.app"
+maven_repository_url: "http://10.42.0.200:8081/repository/maven-releases/"
+web_app_url: "http://10.42.0.202:9080/hello"
+oc_username: "opentlc-mgr"
+oc_password: "r3dh4t1!"
+oc_host: "https://api.cluster-8050.8050.sandbox438.opentlc.com:6443"
+oc_project: "testingv2"
+oc_file_jar: /home/erivasza/Documents/DEMOS/BG-ANSIBLE/test-quarkus/target/hello-2.5-runner.jar
+app_version: "2.5"
