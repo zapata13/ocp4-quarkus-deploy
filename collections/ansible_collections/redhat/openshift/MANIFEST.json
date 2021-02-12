@@ -1,0 +1,41 @@
+{
+ "collection_info": {
+  "description": "OpenShift Collection for Ansible.", 
+  "repository": "https://github.com/ansible-collections/redhat.openshift", 
+  "tags": [
+   "kubernetes", 
+   "k8s", 
+   "cloud", 
+   "infrastructure", 
+   "openshift", 
+   "okd", 
+   "cluster"
+  ], 
+  "dependencies": {
+   "kubernetes.core": ">=1.1.1"
+  }, 
+  "authors": [
+   "geerlingguy (https://www.jeffgeerling.com/)", 
+   "fabianvf (https://github.com/fabianvf)", 
+   "willthames (https://github.com/willthames)", 
+   "Akasurde (https://github.com/akasurde)"
+  ], 
+  "issues": "https://github.com/ansible-collections/redhat.openshift/issues", 
+  "name": "openshift", 
+  "license": [], 
+  "documentation": "", 
+  "namespace": "redhat", 
+  "version": "1.0.1", 
+  "readme": "README.md", 
+  "license_file": "LICENSE", 
+  "homepage": ""
+ }, 
+ "file_manifest_file": {
+  "format": 1, 
+  "ftype": "file", 
+  "chksum_sha256": "136094fad4a9c49731115580a03e85a912589b19ca638e359c1cfbca57146778", 
+  "name": "FILES.json", 
+  "chksum_type": "sha256"
+ }, 
+ "format": 1
+}

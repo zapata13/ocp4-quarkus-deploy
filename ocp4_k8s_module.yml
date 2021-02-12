@@ -1,0 +1,16 @@
+---
+- name: Deploy Application
+  hosts: local
+  become: no
+  gather_facts: false
+  module_defaults:
+    redhat.openshift.openshift_auth:
+      host: "https://api.cluster-8050.8050.sandbox438.opentlc.com:6443"
+      validate_certs: false
+
+  tasks:
+  - name: Log in (obtain access token)
+    redhat.openshift.openshift_auth:
+      username: opentlc-mgr
+      password: r3dh4t1!
+    register: openshift_auth_results
