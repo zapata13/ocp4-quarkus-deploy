@@ -24,34 +24,34 @@
   when: "'Error from server (NotFound)' in ocp_ns.stderr"
 - name: Ensure the BuildConfig exists
   shell: 
-    cmd: "oc get bc quarkus-build -n {{oc_project}}"
+    cmd: "oc get bc {{ app_artifact_id }} -n {{oc_project}}"
   register: ocp_bc
   ignore_errors: yes
 - name: If not exists create BC
   shell: 
-    cmd: "oc new-build java --name quarkus-build --binary -n {{oc_project}}"
+    cmd: "oc new-build java --name {{ app_artifact_id }} --binary -n {{oc_project}}"
   when: "'Error from server (NotFound)' in ocp_bc.stderr"
 - name: Upload jar to image
   shell: 
-    cmd: "oc start-build quarkus-build --from-file={{ app_folder }}/{{ app_artifact_id }}-{{ app_version }}.{{ artifact_extension_type }} --follow -n {{oc_project}}"
+    cmd: "oc start-build {{ app_artifact_id }} --from-file={{ app_folder }}/{{ app_artifact_id }}-{{ app_version }}.{{ artifact_extension_type }} --follow -n {{oc_project}}"
 - name: Ensure the BuildConfig exists
   shell: 
-    cmd: "oc get deployment quarkus-build -n {{oc_project}}"
+    cmd: "oc get deployment {{ app_artifact_id }} -n {{oc_project}}"
   register: ocp_dc
   ignore_errors: yes
 - name: Create POD
   shell: 
-    cmd: "oc new-app quarkus-build -n {{oc_project}}"
+    cmd: "oc new-app {{ app_artifact_id }} -n {{oc_project}}"
   when: "'Error from server (NotFound)' in ocp_dc.stderr"
 - name: Modify quarkus rest  port with ClusterIP
   shell: 
-    cmd: "oc patch svc/quarkus-build -p '{\"spec\":{\"ports\":[{\"name\":\"8080-tcp\",\"port\":8080,\"targetPort\":9080,\"protocol\":\"TCP\"}]}}' -n {{oc_project}}"
+    cmd: "oc patch svc/{{ app_artifact_id }} -p '{\"spec\":{\"ports\":[{\"name\":\"8080-tcp\",\"port\":8080,\"targetPort\":9080,\"protocol\":\"TCP\"}]}}' -n {{oc_project}}"
 - name: Ensure the Route exists
   shell: 
-    cmd: "oc get routes quarkus-build -n {{oc_project}}"
+    cmd: "oc get routes {{ app_artifact_id }} -n {{oc_project}}"
   register: ocp_route
   ignore_errors: yes
 - name: Create Route
   shell: 
-    cmd: "oc expose svc quarkus-build -n {{oc_project}}"
+    cmd: "oc expose svc {{ app_artifact_id }} -n {{oc_project}}"
   when: "'Error from server (NotFound)' in ocp_route.stderr"
